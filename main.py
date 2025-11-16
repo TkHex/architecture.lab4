@@ -20,21 +20,21 @@ else:
 
 if conn:
     with conn.cursor() as cur:
-        cur.execute(""
+        cur.execute("""
             create table if not exists messages (
                 id serial primary key,
                 content text not null,
                 created_at timestamp default now()
             )
-        "")
+        """)
         conn.commit()
 
-@app.route('/save', method=['POST'])
+@app.route('/save', methods=['POST'])
 def save_message():
     if not conn:
         return jsonify({"error": "DB not connected"}), 500
     
-    data = request.get.json()
+    data = request.get_json()
     message = data.get('message', "") if data else ''
 
     with conn.cursor() as cur:
