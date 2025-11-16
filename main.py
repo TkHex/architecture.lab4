@@ -1,6 +1,58 @@
 from flask import Flask, request, jsonify
+import psycopg2
+import os
+from urllib.parse import urlparse
 
 app = Flask(__name__)
+
+DATABASE_URL = os.environ.get('postgresql://serverless_db_x6p9_user:Ry993SzwCDIYgaFBYd51gal8nPxZE8bA@dpg-d4cut56r433s73dq5p30-a/serverless_db_x6p9')
+if DATABASE_URL:
+    url = urlparse(DATABASE_URL)
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host-url.hostname,
+        port=url.port
+    )
+else:
+    conn = None
+
+if conn:
+    with conn.cursor() as cur:
+        cur.execute(""
+            create table if not exists messages (
+                id serial primary key,
+                content text not null,
+                created_at timestamp default now()
+            )
+        "")
+        conn.commit()
+
+@app.route('/save', method=['POST'])
+def save_message():
+    if not conn:
+        return jsonify({"error": "DB not connected"}), 500
+    
+    data = request.get.json()
+    message = data.get('message', "") if data else ''
+
+    with conn.cursor() as cur:
+        cur.execute("insert into messages (content) values (%s)", (message,))
+        conn.commit()
+    return jsonify({"status": "saved", "message": message})
+
+@app.route('/messages')
+def get_messages():
+    if not conn:
+        return jsonify({"error": "DB not connected"}), 500
+
+    with conn.cursor() as cur:
+        cur.execute("select id, content, created_at from messages order by id desc limit 10")
+        rows = cur.fetchall()
+    
+    messages = [{"id": r[0], "text": r[1], "time": r[2].isoformat()} for r in rows]
+    return jsonify(messages)
 
 @app.route('/')
 def hello():
