@@ -12,7 +12,7 @@ if DATABASE_URL:
         database=url.path[1:],
         user=url.username,
         password=url.password,
-        host-url.hostname,
+        host=url.hostname,
         port=url.port
     )
 else:
