@@ -6,7 +6,7 @@ app = Flask(__name__)
 def hello():
     return "Hello, Serverless! 🚀\n", 200, {'Content-Type': 'text/plain'}
 
-@app.route('/echo', method=['POST'])
+@app.route('/echo', methods=['POST'])
 def echo():
     data = request.get_json()
     return jsonify({
